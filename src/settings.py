@@ -55,7 +55,7 @@ CLASS2COLOR: Optional[Dict[str, List[str]]] = None
 # If specific colors for classes are needed, fill this dict (e.g. {"class1": [255, 0, 0], "class2": [0, 255, 0]})
 
 PAPER: Optional[str] = "https://onlinelibrary.wiley.com/doi/10.1002/ima.22662"
-CITATION_URL: Optional[str] = None
+CITATION_URL: Optional[str] = "https://www.kaggle.com/datasets/zeeshanahmed13/intraretinal-cystoid-fluid"
 AUTHORS: Optional[List[str]] = [
     "Zeeshan Ahmed",
     "Munawar Ahmed",

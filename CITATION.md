@@ -1,12 +1,7 @@
 If you make use of the Intraretinal Cystoid Fluid data, please cite the following reference:
 
-``` bibtex 
-@dataset{Intraretinal Cystoid Fluid,
-	author={Zeeshan Ahmed and Munawar Ahmed and Attiya Baqai and Fahim Aziz Umrani},
-	title={Intraretinal Cystoid Fluid},
-	year={2022},
-	url={https://www.kaggle.com/datasets/zeeshanahmed13/intraretinal-cystoid-fluid}
-}
+```apa
+Zeeshan Ahmed, Munawar Ahmed, Attiya Baqai, & Fahim Aziz Umrani. (2022). Intraretinal Cystoid Fluid [Data set]. Kaggle. https://doi.org/10.34740/KAGGLE/DS/2277068
 ```
 
-[🔗 Source](https://www.kaggle.com/datasets/zeeshanahmed13/intraretinal-cystoid-fluid)
+[Source](https://www.kaggle.com/datasets/zeeshanahmed13/intraretinal-cystoid-fluid)
