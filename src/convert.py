@@ -2,9 +2,10 @@ import glob
 import os
 from urllib.parse import unquote, urlparse
 
+import cv2
+import numpy as np
 import supervisely as sly
 from cv2 import connectedComponents
-from dataset_tools.convert import unpack_if_archive
 from supervisely.io.fs import (
     file_exists,
     get_file_name,
@@ -14,57 +15,47 @@ from supervisely.io.fs import (
 from tqdm import tqdm
 
 import src.settings as s
+from dataset_tools.convert import unpack_if_archive
 
 
-def download_dataset(teamfiles_dir: str) -> str:
-    """Use it for large datasets to convert them on the instance"""
-    api = sly.Api.from_env()
-    team_id = sly.env.team_id()
-    storage_dir = sly.app.get_data_dir()
+def bucket_black_holes(mask):
+    _, labels, stats, _ = cv2.connectedComponentsWithStats(mask.astype(np.uint8), connectivity=4)
 
-    if isinstance(s.DOWNLOAD_ORIGINAL_URL, str):
-        parsed_url = urlparse(s.DOWNLOAD_ORIGINAL_URL)
-        file_name_with_ext = os.path.basename(parsed_url.path)
-        file_name_with_ext = unquote(file_name_with_ext)
+    repaired_mask = np.copy(mask)
 
-        sly.logger.info(f"Start unpacking archive '{file_name_with_ext}'...")
-        local_path = os.path.join(storage_dir, file_name_with_ext)
-        teamfiles_path = os.path.join(teamfiles_dir, file_name_with_ext)
-        fsize = get_file_size(local_path)
-        with tqdm(desc=f"Downloading '{file_name_with_ext}' to buffer..", total=fsize) as pbar:
-            api.file.download(team_id, teamfiles_path, local_path, progress_cb=pbar)
-        dataset_path = unpack_if_archive(local_path)
+    for label in range(1, len(stats)):
+        area = stats[label, cv2.CC_STAT_AREA]
 
-    if isinstance(s.DOWNLOAD_ORIGINAL_URL, dict):
-        for file_name_with_ext, url in s.DOWNLOAD_ORIGINAL_URL.items():
-            local_path = os.path.join(storage_dir, file_name_with_ext)
-            teamfiles_path = os.path.join(teamfiles_dir, file_name_with_ext)
+        if area < 500:
+            center_x = int(stats[label, cv2.CC_STAT_LEFT] + (stats[label, cv2.CC_STAT_WIDTH] / 2))
+            center_y = int(stats[label, cv2.CC_STAT_TOP] + (stats[label, cv2.CC_STAT_HEIGHT] / 2))
 
-            if not os.path.exists(get_file_name(local_path)):
-                fsize = get_file_size(local_path)
-                with tqdm(
-                    desc=f"Downloading '{file_name_with_ext}' to buffer {local_path}...",
-                    total=fsize,
-                    unit="B",
-                    unit_scale=True,
-                ) as pbar:
-                    api.file.download(team_id, teamfiles_path, local_path, progress_cb=pbar)
+            # Calculate the number of white pixels in a 3x3 neighborhood around the black hole
+            surrounding_pixels = repaired_mask[
+                center_y - 1 : center_y + 2, center_x - 1 : center_x + 2
+            ]
+            surrounding_white_pixels = np.sum(surrounding_pixels == 255)
 
-                sly.logger.info(f"Start unpacking archive '{file_name_with_ext}'...")
-                unpack_if_archive(local_path)
-            else:
-                sly.logger.info(
-                    f"Archive '{file_name_with_ext}' was already unpacked to '{os.path.join(storage_dir, get_file_name(file_name_with_ext))}'. Skipping..."
-                )
+            # Calculate the percentage of surrounding white pixels
+            percentage_white = (surrounding_white_pixels / 9) * 100  # 9 pixels in total
 
-        dataset_path = storage_dir
-    return dataset_path
+            # Check if 50% or more of the surrounding pixels are white
+            if percentage_white >= 50:
+                # Add the black hole to the corresponding bucket
+                # if label not in buckets:
+                #     buckets[label] = []
+                # buckets[label].append((center_x, center_y))
+
+                # Repair the black hole by filling it with white (255)
+                repaired_mask[labels == label] = 255
+
+    return repaired_mask
 
 
 def convert_and_upload_supervisely_project(
     api: sly.Api, workspace_id: int, project_name: str
 ) -> sly.ProjectInfo:
-    dataset_path = "/Users/iwatkot/Downloads/ninja/datasets/IntraretinalCystoidFluid/2021-training-data-ZA/2021-training-data-ZA"
+    dataset_path = "/mnt/d/datasetninja-raw/intraretinal-cystoid-fluid/2021-training-data-ZA/2021-training-data-ZA"
 
     ds_name = "ds"
     batch_size = 30
@@ -80,6 +71,7 @@ def convert_and_upload_supervisely_project(
 
         if file_exists(mask_path):
             mask_np = sly.imaging.image.read(mask_path)[:, :, 0]
+            mask_np = bucket_black_holes(mask_np)
             img_height = mask_np.shape[0]
             img_wight = mask_np.shape[1]
             mask = mask_np == 255

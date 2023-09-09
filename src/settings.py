@@ -15,6 +15,7 @@ from dataset_tools.templates import (
 ##################################
 PROJECT_NAME: str = "Intraretinal Cystoid Fluid"
 PROJECT_NAME_FULL: str = "Intraretinal Cystoid Fluid"
+HIDE_DATASET = True  # set False when 100% sure about repo quality
 
 ##################################
 # * After uploading to instance ##
@@ -37,7 +38,7 @@ if RELEASE_DATE is None:
 HOMEPAGE_URL: str = "https://www.kaggle.com/datasets/zeeshanahmed13/intraretinal-cystoid-fluid"
 # e.g. "https://some.com/dataset/homepage"
 
-PREVIEW_IMAGE_ID: int = 1527991
+PREVIEW_IMAGE_ID: int = 3540833
 # This should be filled AFTER uploading images to instance, just ID of any image.
 
 GITHUB_URL: str = "https://github.com/dataset-ninja/intraretinal-cystoid-fluid"
@@ -55,7 +56,9 @@ CLASS2COLOR: Optional[Dict[str, List[str]]] = None
 # If specific colors for classes are needed, fill this dict (e.g. {"class1": [255, 0, 0], "class2": [0, 255, 0]})
 
 PAPER: Optional[str] = "https://onlinelibrary.wiley.com/doi/10.1002/ima.22662"
-CITATION_URL: Optional[str] = "https://www.kaggle.com/datasets/zeeshanahmed13/intraretinal-cystoid-fluid"
+CITATION_URL: Optional[
+    str
+] = "https://www.kaggle.com/datasets/zeeshanahmed13/intraretinal-cystoid-fluid"
 AUTHORS: Optional[List[str]] = [
     "Zeeshan Ahmed",
     "Munawar Ahmed",
@@ -94,6 +97,7 @@ def get_settings():
     settings = {
         "project_name": PROJECT_NAME,
         "license": LICENSE,
+        "hide_dataset": HIDE_DATASET,
         "applications": APPLICATIONS,
         "category": CATEGORY,
         "cv_tasks": CV_TASKS,
