@@ -4,6 +4,7 @@ from urllib.parse import unquote, urlparse
 
 import cv2
 import numpy as np
+import scipy.ndimage as ndimage
 import supervisely as sly
 from cv2 import connectedComponents
 from supervisely.io.fs import (
@@ -18,47 +19,13 @@ import src.settings as s
 from dataset_tools.convert import unpack_if_archive
 
 
-def bucket_black_holes(mask):
-    _, labels, stats, _ = cv2.connectedComponentsWithStats(mask.astype(np.uint8), connectivity=4)
-
-    repaired_mask = np.copy(mask)
-
-    for label in range(1, len(stats)):
-        area = stats[label, cv2.CC_STAT_AREA]
-
-        if area < 500:
-            center_x = int(stats[label, cv2.CC_STAT_LEFT] + (stats[label, cv2.CC_STAT_WIDTH] / 2))
-            center_y = int(stats[label, cv2.CC_STAT_TOP] + (stats[label, cv2.CC_STAT_HEIGHT] / 2))
-
-            # Calculate the number of white pixels in a 3x3 neighborhood around the black hole
-            surrounding_pixels = repaired_mask[
-                center_y - 1 : center_y + 2, center_x - 1 : center_x + 2
-            ]
-            surrounding_white_pixels = np.sum(surrounding_pixels == 255)
-
-            # Calculate the percentage of surrounding white pixels
-            percentage_white = (surrounding_white_pixels / 9) * 100  # 9 pixels in total
-
-            # Check if 50% or more of the surrounding pixels are white
-            if percentage_white >= 50:
-                # Add the black hole to the corresponding bucket
-                # if label not in buckets:
-                #     buckets[label] = []
-                # buckets[label].append((center_x, center_y))
-
-                # Repair the black hole by filling it with white (255)
-                repaired_mask[labels == label] = 255
-
-    return repaired_mask
-
-
 def convert_and_upload_supervisely_project(
     api: sly.Api, workspace_id: int, project_name: str
 ) -> sly.ProjectInfo:
     dataset_path = "/mnt/d/datasetninja-raw/intraretinal-cystoid-fluid/2021-training-data-ZA/2021-training-data-ZA"
 
     ds_name = "ds"
-    batch_size = 30
+    batch_size = 10
 
     images_folder_name = "images"
     masks_folder_name = "masks"
@@ -71,7 +38,7 @@ def convert_and_upload_supervisely_project(
 
         if file_exists(mask_path):
             mask_np = sly.imaging.image.read(mask_path)[:, :, 0]
-            mask_np = bucket_black_holes(mask_np)
+            mask_np = np.where(ndimage.binary_fill_holes(mask_np).astype("uint8") == 1, 255, 0)
             img_height = mask_np.shape[0]
             img_wight = mask_np.shape[1]
             mask = mask_np == 255

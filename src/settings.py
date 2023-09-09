@@ -15,7 +15,7 @@ from dataset_tools.templates import (
 ##################################
 PROJECT_NAME: str = "Intraretinal Cystoid Fluid"
 PROJECT_NAME_FULL: str = "Intraretinal Cystoid Fluid"
-HIDE_DATASET = False  # set False when 100% sure about repo quality
+HIDE_DATASET = True  # set False when 100% sure about repo quality
 
 ##################################
 # * After uploading to instance ##
@@ -38,7 +38,7 @@ if RELEASE_DATE is None:
 HOMEPAGE_URL: str = "https://www.kaggle.com/datasets/zeeshanahmed13/intraretinal-cystoid-fluid"
 # e.g. "https://some.com/dataset/homepage"
 
-PREVIEW_IMAGE_ID: int = 3540833
+PREVIEW_IMAGE_ID: int = 3542493
 # This should be filled AFTER uploading images to instance, just ID of any image.
 
 GITHUB_URL: str = "https://github.com/dataset-ninja/intraretinal-cystoid-fluid"
