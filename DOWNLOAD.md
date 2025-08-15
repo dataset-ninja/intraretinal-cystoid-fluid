@@ -1,6 +1,6 @@
 Dataset **Intraretinal Cystoid Fluid** can be downloaded in [Supervisely format](https://developer.supervisely.com/api-references/supervisely-annotation-json-format):
 
- [Download](https://assets.supervisely.com/remote/eyJsaW5rIjogImZzOi8vYXNzZXRzLzE5NjlfSW50cmFyZXRpbmFsIEN5c3RvaWQgRmx1aWQvaW50cmFyZXRpbmFsLWN5c3RvaWQtZmx1aWQtRGF0YXNldE5pbmphLnRhciIsICJzaWciOiAiRno5dytGYk9ZM21wRTZQVHhpbzU2SGMydmNxUU0vL0lpK3NpSjNpWG5aND0ifQ==)
+ [Download](https://assets.supervisely.com/remote/eyJsaW5rIjogInMzOi8vc3VwZXJ2aXNlbHktZGF0YXNldHMvMTk2OV9JbnRyYXJldGluYWwgQ3lzdG9pZCBGbHVpZC9pbnRyYXJldGluYWwtY3lzdG9pZC1mbHVpZC1EYXRhc2V0TmluamEudGFyIiwgInNpZyI6ICJ5WlcvR1BNaERvTHVYVUU3R3pzNFFtbXhIaS9WelVWaUxTblNwN0cvUHRjPSJ9?response-content-disposition=attachment%3B%20filename%3D%22intraretinal-cystoid-fluid-DatasetNinja.tar%22)
 
 As an alternative, it can be downloaded with *dataset-tools* package:
 ``` bash
